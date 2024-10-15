@@ -2,10 +2,12 @@ package me.z7087.kb2expl.listener;
 
 import me.z7087.kb2expl.nms.INMS;
 import me.z7087.kb2expl.nms.NMSManager;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityKnockbackEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
@@ -14,6 +16,7 @@ import org.bukkit.util.Vector;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class KnockBackListener implements Listener {
     private static final Set<EntityKnockbackEvent.KnockbackCause> KNOCKBACK_CAUSES;
@@ -32,15 +35,20 @@ public class KnockBackListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEntityKnockBack(EntityKnockbackEvent event) {
+    public void onEntityKnockBackByEntity(EntityKnockbackByEntityEvent event) {
         if (!state)
             return;
         if (event.isAsynchronous())
             return;
         if (event.getEntity() instanceof Player player) {
+            final Entity sourceEntity = event.getSourceEntity();
             // when a player on the ground is knocked back, it's vertical motion increases
             // and makes unfair advantages if we change this knockback to an explosion
-            if (KNOCKBACK_CAUSES.contains(event.getCause()) && !isPlayerOnGround(player)) {
+            if (sourceEntity instanceof Player
+                    && nmsManager.getNMS().isHurtMarked(sourceEntity)
+                    && KNOCKBACK_CAUSES.contains(event.getCause())
+                    && !isPlayerOnGround(player)
+            ) {
                 PlayerGotKBMap.put(player, player.getVelocity());
             } else {
                 PlayerGotKBMap.remove(player);
@@ -57,8 +65,8 @@ public class KnockBackListener implements Listener {
         final Player player = event.getPlayer();
         final Vector playerVelocityOld = PlayerGotKBMap.remove(player);
         if (playerVelocityOld != null && !event.isCancelled()) {
-            //System.out.println("originkb: " + event.getVelocity() + ", originmotion: " + playerVelocityOld + ", to: " + event.getVelocity().clone().subtract(playerVelocityOld));
-            INMS nms = nmsManager.getNMS();
+            //logger.warning("originkb: " + event.getVelocity() + ", originmotion: " + playerVelocityOld + ", to: " + event.getVelocity().clone().subtract(playerVelocityOld));
+            final INMS nms = nmsManager.getNMS();
             if (!player.getVelocity().equals(event.getVelocity())) {
                 player.setVelocity(event.getVelocity());
             }
@@ -88,4 +96,5 @@ public class KnockBackListener implements Listener {
         this.state = state;
         PlayerGotKBMap.clear();
     }
+    public Logger logger;
 }

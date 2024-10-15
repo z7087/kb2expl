@@ -18,6 +18,7 @@ public final class Kb2expl extends JavaPlugin {
     @Override
     public void onLoad() {
         nmsManager.load(this.getServer().getClass().getName());
+        knockBackListener.logger = this.getLogger();
     }
 
     @Override

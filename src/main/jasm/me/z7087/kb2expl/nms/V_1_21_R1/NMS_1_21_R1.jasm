@@ -21,6 +21,16 @@ implements me/z7087/kb2expl/nms/INMS
     }
 
     @java/lang/Override
+    public isHurtMarked(org/bukkit/entity/Entity)Z {
+        // return ((CraftEntity) entity).getHandle().hurtMarked
+        aload 1
+        checkcast org/bukkit/craftbukkit/entity/CraftEntity
+        invokevirtual org/bukkit/craftbukkit/entity/CraftEntity.getHandle()net/minecraft/world/entity/Entity
+        getfield net/minecraft/world/entity/Entity.hurtMarked Z
+        ireturn
+    }
+
+    @java/lang/Override
     public setHurtMarked(org/bukkit/entity/Entity, Z)V {
         // ((CraftEntity) entity).getHandle().hurtMarked = hurtMarked
         aload 1
