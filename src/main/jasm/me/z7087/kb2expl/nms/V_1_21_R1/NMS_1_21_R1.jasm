@@ -1,0 +1,101 @@
+public final class me/z7087/kb2expl/nms/V_1_21_R1/NMS_1_21_R1
+implements me/z7087/kb2expl/nms/INMS
+{
+    private final holder net/minecraft/core/Holder
+    public <init>()V {
+        // super()
+        aload 0
+        invokespecial java/lang/Object.<init>()V
+        // this.holder = MinecraftServer.getServer().registryAccess().registryOrThrow(Registries.SOUND_EVENT).wrapAsHolder(SoundEvents.EMPTY)
+        invokestatic net/minecraft/server/MinecraftServer.getServer()net/minecraft/server/MinecraftServer
+        invokevirtual net/minecraft/server/MinecraftServer.registryAccess()net/minecraft/core/RegistryAccess$Frozen
+        getstatic net/minecraft/core/registries/Registries.SOUND_EVENT net/minecraft/resources/ResourceKey
+        invokeinterface net/minecraft/core/RegistryAccess.registryOrThrow(net/minecraft/resources/ResourceKey)net/minecraft/core/Registry
+        getstatic net/minecraft/sounds/SoundEvents.EMPTY net/minecraft/sounds/SoundEvent
+        invokeinterface net/minecraft/core/Registry.wrapAsHolder(java/lang/Object)net/minecraft/core/Holder
+        aload 0
+        swap
+        putfield me/z7087/kb2expl/nms/V_1_21_R1/NMS_1_21_R1.holder net/minecraft/core/Holder
+        //
+        return
+    }
+
+    @java/lang/Override
+    public setHurtMarked(org/bukkit/entity/Entity, Z)V {
+        // ((CraftEntity) entity).getHandle().hurtMarked = hurtMarked
+        aload 1
+        checkcast org/bukkit/craftbukkit/entity/CraftEntity
+        invokevirtual org/bukkit/craftbukkit/entity/CraftEntity.getHandle()net/minecraft/world/entity/Entity
+        iload 2
+        putfield net/minecraft/world/entity/Entity.hurtMarked Z
+        //
+        return
+    }
+
+    @java/lang/Override
+    public broadcast(org/bukkit/entity/Entity)V {
+        // _stack_ref_entity = ((CraftEntity) entity).getHandle()
+        // _stack_ref_entity.moonrise$getTrackedEntity().broadcast(createSetEntityMotionPacket(_stack_ref_entity))
+        aload 1
+        checkcast org/bukkit/craftbukkit/entity/CraftEntity
+        invokevirtual org/bukkit/craftbukkit/entity/CraftEntity.getHandle()net/minecraft/world/entity/Entity
+        dup
+        invokevirtual net/minecraft/world/entity/Entity.moonrise$getTrackedEntity()net/minecraft/server/level/ChunkMap$TrackedEntity
+        swap
+        invokestatic me/z7087/kb2expl/nms/V_1_21_R1/NMS_1_21_R1.createSetEntityMotionPacket(net/minecraft/world/entity/Entity)net/minecraft/network/protocol/game/ClientboundSetEntityMotionPacket
+        invokevirtual net/minecraft/server/level/ChunkMap$TrackedEntity.broadcast(net/minecraft/network/protocol/Packet)V
+        return
+    }
+
+    @java/lang/Override
+    public sendExplosionPacket(org/bukkit/entity/Player, org/bukkit/util/Vector)V {
+        // ((ServerCommonPacketListenerImpl) ((CraftPlayer) player).getHandle().connection).send(this.createExplosionPacket(vec))
+        aload 1
+        checkcast org/bukkit/craftbukkit/entity/CraftPlayer
+        invokevirtual org/bukkit/craftbukkit/entity/CraftPlayer.getHandle()net/minecraft/server/level/ServerPlayer
+        getfield net/minecraft/server/level/ServerPlayer.connection net/minecraft/server/network/ServerGamePacketListenerImpl
+        aload 0
+        aload 2
+        invokespecial me/z7087/kb2expl/nms/V_1_21_R1/NMS_1_21_R1.createExplosionPacket(org/bukkit/util/Vector)net/minecraft/network/protocol/game/ClientboundExplodePacket
+        invokevirtual net/minecraft/server/network/ServerCommonPacketListenerImpl.send(net/minecraft/network/protocol/Packet)V
+        //
+        return
+    }
+
+    private static createSetEntityMotionPacket(net/minecraft/world/entity/Entity)net/minecraft/network/protocol/game/ClientboundSetEntityMotionPacket {
+        // return new ClientboundSetEntityMotionPacket(entity)
+        new net/minecraft/network/protocol/game/ClientboundSetEntityMotionPacket
+        dup
+        aload 0
+        invokespecial net/minecraft/network/protocol/game/ClientboundSetEntityMotionPacket.<init>(net/minecraft/world/entity/Entity)V
+        areturn
+    }
+
+    private createExplosionPacket(org/bukkit/util/Vector)net/minecraft/network/protocol/game/ClientboundExplodePacket {
+        // return new ClientboundExplodePacket(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 0F, Collections.emptyList(), CraftVector.toNMS(vec), BlockInteraction.KEEP, ParticleTypes.CRIT, ParticleTypes.CRIT, this.holder)
+        new net/minecraft/network/protocol/game/ClientboundExplodePacket
+        dup
+        // x, y, z
+        getstatic java/lang/Double.POSITIVE_INFINITY D
+        dup2
+        dup2
+        // radius
+        fconst 0
+        // affectedBlocks
+        invokestatic java/util/Collections.emptyList()java/util/List
+        // playerVelocity
+        aload 1
+        invokestatic org/bukkit/craftbukkit/util/CraftVector.toNMS(org/bukkit/util/Vector)net/minecraft/world/phys/Vec3
+        // destructionType
+        getstatic net/minecraft/world/level/Explosion$BlockInteraction.KEEP net/minecraft/world/level/Explosion$BlockInteraction
+        // particle
+        getstatic net/minecraft/core/particles/ParticleTypes.CRIT net/minecraft/core/particles/SimpleParticleType
+        // emitterParticle
+        dup
+        // holder
+        aload 0
+        getfield me/z7087/kb2expl/nms/V_1_21_R1/NMS_1_21_R1.holder net/minecraft/core/Holder
+        invokespecial net/minecraft/network/protocol/game/ClientboundExplodePacket.<init>(D, D, D, F, java/util/List, net/minecraft/world/phys/Vec3, net/minecraft/world/level/Explosion$BlockInteraction, net/minecraft/core/particles/ParticleOptions, net/minecraft/core/particles/ParticleOptions, net/minecraft/core/Holder)V
+        areturn
+    }
+}
