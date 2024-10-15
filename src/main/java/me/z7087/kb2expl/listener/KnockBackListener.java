@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityKnockbackEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
@@ -39,7 +38,9 @@ public class KnockBackListener implements Listener {
         if (event.isAsynchronous())
             return;
         if (event.getEntity() instanceof Player player) {
-            if (KNOCKBACK_CAUSES.contains(event.getCause())) {
+            // when a player on the ground is knocked back, it's vertical motion increases
+            // and makes unfair advantages if we change this knockback to an explosion
+            if (KNOCKBACK_CAUSES.contains(event.getCause()) && !isPlayerOnGround(player)) {
                 PlayerGotKBMap.put(player, player.getVelocity());
             } else {
                 PlayerGotKBMap.remove(player);
@@ -57,9 +58,11 @@ public class KnockBackListener implements Listener {
         final Vector playerVelocityOld = PlayerGotKBMap.remove(player);
         if (playerVelocityOld != null && !event.isCancelled()) {
             //System.out.println("originkb: " + event.getVelocity() + ", originmotion: " + playerVelocityOld + ", to: " + event.getVelocity().clone().subtract(playerVelocityOld));
-            event.setCancelled(true);
             INMS nms = nmsManager.getNMS();
-            player.setVelocity(event.getVelocity().clone());
+            if (!player.getVelocity().equals(event.getVelocity())) {
+                player.setVelocity(event.getVelocity());
+            }
+            event.setCancelled(true);
             nms.setHurtMarked(player, false); // do this after setVelocity
             nms.broadcast(player);
             nms.sendExplosionPacket(player, event.getVelocity().clone().subtract(playerVelocityOld));
@@ -74,6 +77,11 @@ public class KnockBackListener implements Listener {
         PlayerGotKBMap.remove(event.getPlayer());
     }
 
+    @SuppressWarnings("deprecation")
+    private static boolean isPlayerOnGround(Player player) {
+        // we have to check its onGround state even it's controlled only by the client
+        return player.isOnGround();
+    }
 
     private boolean state;
     public void setState(boolean state) {
