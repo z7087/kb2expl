@@ -45,7 +45,7 @@ public class KnockBackListener implements Listener {
             // when a player on the ground is knocked back, it's vertical motion increases
             // and makes unfair advantages if we change this knockback to an explosion
             if (sourceEntity instanceof Player
-                    && nmsManager.getNMS().isHurtMarked(sourceEntity)
+                    && nmsManager.getNMS().isHurtMarked(player)
                     && KNOCKBACK_CAUSES.contains(event.getCause())
                     && !isPlayerOnGround(player)
             ) {
